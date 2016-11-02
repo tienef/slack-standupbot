@@ -2,6 +2,7 @@ import locale
 from standup.model.conversation import Conversation
 from standup.model.report import Report
 from datetime import datetime
+import html
 
 
 # Localisation en FR
