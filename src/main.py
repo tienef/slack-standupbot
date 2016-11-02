@@ -20,4 +20,3 @@ if __name__ == '__main__':
 
     bot = StandUpBot(slack, confluence, conflSpaceKey, conflMainContentId)
     bot.run()
-
