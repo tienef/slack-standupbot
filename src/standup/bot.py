@@ -71,7 +71,7 @@ class StandUpBot:
         conflContent = self.confluence.get_contentId_from_title(title, self.spaceKey)
 
         # On constitue le HTML
-        HTML = '<html xmlns:string=\"xalan://java.lang.String\" xmlns:lxslt=\"http://xml.apache.org/xslt\"><head><title>%(title)s</title></head><body><table width=\"100%%\"><tr><td align=\"left\"></td></tr></table>' % {
+        HTML = '<html xmlns:string=\"xalan://java.lang.String\" xmlns:lxslt=\"http://xml.apache.org/xslt\"><head><title>%(title)s</title></head><body>' % {
             'title': title}
         for report in allReports:
             HTML += '<h2>%(user)s</h2><table class=\"details\" border=\"0\" cellpadding=\"5\" cellspacing=\"2\" width=\"95%%\"><tr valign=\"top\" class=\"TableRowColor\"><th>Yesterday</th><td width=\"90%%\">%(yesterday)s</td></tr><tr valign=\"top\" class=\"TableRowColor\"><th>Today</th><td>%(today)s</td></tr><tr valign=\"top\" class=\"TableRowColor\"><th>Obstacles</th><td>%(obstacles)s</td></tr></table>' \
