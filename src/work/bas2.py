@@ -20,15 +20,11 @@ conflUser = "thomas.faivre"
 conflPassword = "thomas.faivre"
 
 
-def printResponse(r):
-	print('{} {}\n'.format(json.dumps(r.json(), sort_keys=True, indent=4, separators=(',', ': ')), r))
-
-
 r = requests.get(conflServer+'/rest/api/content',
 	params={'title' : 'Functional'},
 	auth=(conflUser, conflPassword))
 
-printResponse(r)
+print(r.json())
 
 """
 parentPage = r.json()['results'][0]

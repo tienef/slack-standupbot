@@ -1,13 +1,13 @@
 import urllib.request
 import json
 from datetime import datetime
-import locale
 
+"""
 ##Localisation en FR
 locale.setlocale(locale.LC_ALL, 'fra_fra')
 
 ##Slack
-token = "xoxb-89846243653-IAcQ287gmTpCB9xKcVkl1iKo"
+slackToken = "xoxb-89846243653-IAcQ287gmTpCB9xKcVkl1iKo"
 slackServer = "https://slack.com"
 
 ##Confluence
@@ -30,12 +30,12 @@ class Report:
         self.obstacles = ''
         self.user_id = ''
         self.name = ''
-
+"""
 allConversations = []
 allReports = []
 
 ##Récupération des conversactions directe entre le bot et les users
-slackIMListRequest = urllib.request.Request(url='https://slack.com/api/im.list?token=%s' % token, method='GET')
+slackIMListRequest = urllib.request.Request(url='https://slack.com/api/im.list?token=%s' % slackToken, method='GET')
 slackIMListResponse = urllib.request.urlopen(slackIMListRequest)
 slackIMListResponseJSON = json.loads(slackIMListResponse.read().decode('utf-8'))
 
@@ -52,7 +52,7 @@ now = datetime.now()
 nowTS = int(now.timestamp())
 dayStartTS = int(datetime(now.year, now.month,now.day).timestamp())
 for conversation in allConversations:
-    slackIMHistoryRequest = urllib.request.Request(url='https://slack.com/api/im.history?token=%(token)s&channel=%(channel)s&latest=%(latest)s&oldest=%(oldest)s&inclusive=1' % {'token' : token, 'channel' : conversation.id, 'latest' : nowTS, 'oldest' : dayStartTS }, method='GET')
+    slackIMHistoryRequest = urllib.request.Request(url='https://slack.com/api/im.history?token=%(token)s&channel=%(channel)s&latest=%(latest)s&oldest=%(oldest)s&inclusive=1' % {'token' : slackToken, 'channel' : conversation.id, 'latest' : nowTS, 'oldest' : dayStartTS }, method='GET')
     slackIMHistoryResponse = urllib.request.urlopen(slackIMHistoryRequest)
     slackIMHistoryResponseJSON = json.loads(slackIMHistoryResponse.read().decode('utf-8'))
     for message in slackIMHistoryResponseJSON['messages']:
@@ -78,7 +78,7 @@ for conversation in allConversations:
         ##On récupère le nom de l'utilisateur pour chaque rapport
         slackUserInfoRequest = urllib.request.Request(
             url='https://slack.com/api/users.info?token=%(token)s&user=%(user)s' % {
-                'token': token, 'user': conversation.user_id}, method='GET')
+                'token': slackToken, 'user': conversation.user_id}, method='GET')
         slackUserInfoResponseJSON = json.loads(urllib.request.urlopen(slackUserInfoRequest).read().decode('utf-8'))
         report.name = slackUserInfoResponseJSON['user']['real_name']
         allReports.append(report)
