@@ -10,36 +10,45 @@ locale.setlocale(locale.LC_ALL, 'fra_fra')
 
 
 class StandUpBot:
-    def __init__(self, slackClient, confluenceClient, spaceKey, conflMainContentId):
+    def __init__(self, slackClient, confluenceClient, spaceKey, conflMainContentName, slackChannel):
         self.slack = slackClient
         self.confluence = confluenceClient
         self.spaceKey = spaceKey
-        self.conflMainContentId = conflMainContentId
+        self.conflMainContentName = conflMainContentName
+        self.slackChannel = slackChannel
 
     def run(self):
         allConversations = []
         allReports = []
 
-        # Récupération des conversactions directe entre le bot et les users
-        slackIMListResponse = self.slack.get("/api/im.list", {"token": self.slack.token})
+        # Récupération de l'id du channel
+        channelsList = self.slack.get("/api/channels.list",
+                       {'token': self.slack.token})
+        for channel in channelsList["channels"]:
+            if channel["name"] == self.slackChannel:
+                channelId = channel["id"]
+        if not channelId:
+            return("Aucun channel de ce nom n'existe !")
 
-        # Pour chaque im engagé avec le bot, on instancie un nouveau rapport
-        for im in slackIMListResponse['ims']:
-            conversation = Conversation()
-            conversation.user_id = im['user']
-            conversation.id = im['id']
-            allConversations.append(conversation)
-
-        # Pour chaque conversation, on récupère la liste des messages de ce jour
+        # Récupération des messages pour chaque utilisateur (=conversation) sur le channel demandé de ce jour
         now = datetime.now()
         nowTS = int(now.timestamp())
         dayStartTS = int(datetime(now.year, now.month, now.day).timestamp())
-        for conversation in allConversations:
-            slackIMHistoryResponse = self.slack.get("/api/im.history",
-                                                    {'token': self.slack.token, 'channel': conversation.id,
-                                                     'latest': nowTS, 'oldest': dayStartTS})
-            for message in slackIMHistoryResponse['messages']:
-                conversation.messages.append(message['text'])
+        MessagesList = self.slack.get("/api/channels.history",
+                                      {'token': self.slack.token, 'channel': channelId,
+                                       'latest': nowTS, 'oldest': dayStartTS, 'count' : "1000"})
+
+        for message in MessagesList["messages"]:
+            found = False
+            for elemen in allConversations:
+                if elemen.user_id == message["user"]:
+                    elemen.messages.append(message["text"])
+                    found = True
+            if not found:
+                conversation = Conversation()
+                conversation.user_id = message["user"]
+                conversation.messages.append(message["text"])
+                allConversations.append(conversation)
 
         # Pour chaque conversation, on regarde si elle contient un message déclenchant la génération d'un rapport
         for conversation in allConversations:
@@ -81,6 +90,10 @@ class StandUpBot:
                        'obstacles': html.escape(report.obstacles, quote=True)}
         HTML += "</body></html>"
 
+        # On récupère le conflMainContentId à partir du conflMainContentName
+        conflMainContent = self.confluence.get_contentId_from_title(self.conflMainContentName, self.spaceKey)
+        conflMainContentId = conflMainContent["contentId"]
+
         # Page déjà existante : on l'écrase
         if conflContent:
             conflContentId = conflContent["contentId"]
@@ -90,7 +103,7 @@ class StandUpBot:
             # On constitue le JSON contenant le HTML
             JSON = {"type": "page",
                     "title": "%s" % title,
-                    "ancestors": [{'id': self.conflMainContentId}],
+                    "ancestors": [{'id': conflMainContentId}],
                     "space": {'key': self.spaceKey},
                     "version": {'number' : conflContentVersion+1},
                     "body": {'storage': {'value': HTML, 'representation': 'storage'}}}
@@ -101,8 +114,9 @@ class StandUpBot:
             # On constitue le JSON contenant le HTML
             JSON = {"type": "page",
                     "title": "%s" % title,
-                    "ancestors": [{'id': self.conflMainContentId}],
+                    "ancestors": [{'id': conflMainContentId}],
                     "space": {'key': self.spaceKey},
                     "version": {'number' : '1'},
                     "body": {'storage': {'value': HTML, 'representation': 'storage'}}}
             conflContentCreationResponse = self.confluence.create_content("/rest/api/content", JSON)
+        return("Rapport traité sans erreur")
