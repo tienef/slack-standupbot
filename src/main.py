@@ -28,8 +28,8 @@ slackChannel = args.channel
 conflServer = args.serverconfluence
 conflUser = args.userconfluence
 conflPassword = args.passwordconfluence
-conflSpaceKey = args.space
-conflMainContentName = args.page
+conflSpaceKey = args.key
+conflMainContentName = args.nameofconfluencepage
 
 
 if __name__ == '__main__':
