@@ -10,12 +10,13 @@ locale.setlocale(locale.LC_ALL, 'fra_fra')
 
 
 class StandUpBot:
-    def __init__(self, slackClient, confluenceClient, spaceKey, conflMainContentName, slackChannel):
+    def __init__(self, slackClient, confluenceClient, spaceKey, conflMainContentName, slackChannel, conflServer):
         self.slack = slackClient
         self.confluence = confluenceClient
         self.spaceKey = spaceKey
         self.conflMainContentName = conflMainContentName
         self.slackChannel = slackChannel
+        self.conflServer = conflServer
 
     def run(self):
         allConversations = []
@@ -119,4 +120,8 @@ class StandUpBot:
                     "version": {'number' : '1'},
                     "body": {'storage': {'value': HTML, 'representation': 'storage'}}}
             conflContentCreationResponse = self.confluence.create_content("/rest/api/content", JSON)
+            # On modifie le purpose du channel Slack
+            self.slack.get("/api/channels.setPurpose", {'token': self.slack.token, 'channel': channelId,
+                                                        'purpose': self.conflServer +
+                                                                   conflContentCreationResponse["_links"]["webui"]})
         return("Rapport traité sans erreur")

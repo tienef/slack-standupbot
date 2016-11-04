@@ -36,5 +36,5 @@ if __name__ == '__main__':
     slack = SlackClient(slackServer, slackToken)
     confluence = ConfluenceClient(conflServer, conflUser, conflPassword)
 
-    bot = StandUpBot(slack, confluence, conflSpaceKey, conflMainContentName, slackChannel)
+    bot = StandUpBot(slack, confluence, conflSpaceKey, conflMainContentName, slackChannel, conflServer)
     bot.run()
