@@ -12,14 +12,14 @@ parser.add_argument("-p", "--page", help="Nom de la page dans Confluence sous la
 args = parser.parse_args()
 
 # Slack
-slackToken = "xoxb-89846243653-IAcQ287gmTpCB9xKcVkl1iKo"
+slackToken = # example : "xoxb-89846243653-IAcQ287gmTpCB9xKcVkl1iKa"
 slackServer = "https://slack.com"
 slackChannel = args.channel
 
 # Confluence
-conflServer = "https://docs.kepler-rominfo.com"
-conflUser = "thomas.faivre"
-conflPassword = "thomas.faivre"
+conflServer = "x"
+conflUser = "x"
+conflPassword = "x"
 conflSpaceKey = args.space
 conflMainContentName = args.page
 
