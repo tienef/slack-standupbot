@@ -37,4 +37,5 @@ if __name__ == '__main__':
     confluence = ConfluenceClient(conflServer, conflUser, conflPassword)
 
     bot = StandUpBot(slack, confluence, conflSpaceKey, conflMainContentName, slackChannel, conflServer)
-    bot.run()
+    output = bot.run()
+    print(output)

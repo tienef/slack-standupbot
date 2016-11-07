@@ -29,7 +29,7 @@ class StandUpBot:
             if channel["name"] == self.slackChannel:
                 channelId = channel["id"]
         if not channelId:
-            return("Aucun channel de ce nom n'existe !")
+            return("Aucun channel Slack de ce nom n'existe !")
 
         # Récupération des messages pour chaque utilisateur (=conversation) sur le channel demandé de ce jour
         now = datetime.now()
