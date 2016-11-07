@@ -22,6 +22,7 @@ class StandUpBot:
         allConversations = []
         allReports = []
 
+
         # Récupération de l'id du channel
         channelsList = self.slack.get("/api/channels.list",
                        {'token': self.slack.token})
@@ -72,6 +73,8 @@ class StandUpBot:
                 slackUserInfoResponse = self.slack.get("/api/users.info",
                                                        {'token': self.slack.token, 'user': conversation.user_id})
                 report.name = slackUserInfoResponse['user']['real_name']
+                if not report.name:
+                    report.name = slackUserInfoResponse['user']['name']
                 allReports.append(report)
 
         # On définie le titre du rapport d'après la date du jour
